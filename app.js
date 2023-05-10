@@ -1,21 +1,26 @@
-setInterval(setClock, 1000)
+const allzone = document.getElementById('allzone')
+const currentTime = document.getElementById('currentTime')
 
-const hourHand = document.querySelector('[data-hour-hand]')
-const minuteHand = document.querySelector('[data-minute-hand]')
-const secondHand = document.querySelector('[data-second-hand]')
+currentTime.innerText = new Date().toLocaleString('en-us', 
+{ timeStyle: 'full'})
 
-function setClock() {
-  const currentDate = new Date()
-  const secondsRatio = currentDate.getSeconds() / 60
-  const minutesRatio = (secondsRatio + currentDate.getMinutes()) / 60
-  const hoursRatio = (minutesRatio + currentDate.getHours()) / 12
-  setRotation(secondHand, secondsRatio)
-  setRotation(minuteHand, minutesRatio)
-  setRotation(hourHand, hoursRatio)
+fetch('worldclock.json')
+.then( res => res.json())
+.then( data => {
+    data.map( e => {
+        const option = document.createElement('option')
+        option.innerText = e.timezone
+        allzone.appendChild(option)
+    })
+})
+.catch( err => console.log(err))
+
+allzone.oninput = () => setInterval( () => time(), 1000)
+
+const time = () => {
+    const ctime = new Date().toLocaleString('en-us', {
+        timeZone: allzone.value, timeStyle: 'full'
+    })
+
+    currentTime.innerText = ctime
 }
-
-function setRotation(element, rotationRatio) {
-  element.style.setProperty('--rotation', rotationRatio * 360)
-}
-
-setClock()
